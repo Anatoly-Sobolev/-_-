@@ -1,0 +1,14 @@
+# Build artifacts
+bin/
+obj/
+x64/
+.vs/
+
+# User/editor files
+*.user
+*.suo
+*.tmp
+~$*
+
+# Local backups
+Резервные_копии_до_форматирования/
