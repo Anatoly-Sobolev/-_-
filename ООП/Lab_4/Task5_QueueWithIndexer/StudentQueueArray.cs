@@ -12,19 +12,32 @@ public class StudentQueueArray
         _items = new Student[capacity];
     }
 
-    public int Count => _count;
+    public int Count
+    {
+        get
+        {
+            return _count;
+        }
+    }
 
     public void Enqueue(Student student)
     {
         if (_count == _items.Length)
+        {
             Array.Resize(ref _items, _items.Length * 2);
+        }
+
         _items[_count++] = student;
     }
 
     public Student Dequeue()
     {
-        if (_count == 0) throw new InvalidOperationException("Очередь пуста.");
-        var item = _items[0];
+        if (_count == 0)
+        {
+            throw new InvalidOperationException("Очередь пуста.");
+        }
+
+        Student item = _items[0];
         Array.Copy(_items, 1, _items, 0, _count - 1);
         _count--;
         return item;
@@ -36,7 +49,10 @@ public class StudentQueueArray
         get
         {
             if (index < 0 || index >= _count)
+            {
                 throw new IndexOutOfRangeException();
+            }
+
             return _items[index];
         }
     }

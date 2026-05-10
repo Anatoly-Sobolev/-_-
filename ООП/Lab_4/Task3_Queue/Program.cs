@@ -2,18 +2,33 @@ using Task3_Queue;
 
 string[] names = { "Иванов А.", "Петров Д.", "Сидоров С.", "Козлов А.", "Новиков М." };
 
-var queue = new Queue<Student>();
-foreach (var name in names)
+Queue<Student> queue = new Queue<Student>();
+
+foreach (string name in names)
+{
     queue.Enqueue(Student.GenerateStudent(name));
+}
 
 Console.WriteLine("Очередь на проверку:");
-foreach (var s in queue)
-    Console.WriteLine($"  {s.GetStudentInfo()}");
+foreach (Student student in queue)
+{
+    Console.WriteLine($"  {student.GetStudentInfo()}");
+}
 
 Console.WriteLine("\nРезультаты:");
 while (queue.Count > 0)
 {
-    var s = queue.Dequeue();
-    string result = s.GetDecision() ? "ОТЧИСЛЕН" : "остаётся";
-    Console.WriteLine($"  {s.Name}: {result}");
+    Student student = queue.Dequeue();
+    string result;
+
+    if (student.GetDecision())
+    {
+        result = "ОТЧИСЛЕН";
+    }
+    else
+    {
+        result = "остаётся";
+    }
+
+    Console.WriteLine($"  {student.Name}: {result}");
 }

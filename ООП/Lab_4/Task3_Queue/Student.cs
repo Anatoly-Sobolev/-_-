@@ -27,19 +27,25 @@ public class Student : IStudent
 
     public static Student GenerateStudent(string name)
     {
-        return new Student(name,
-            _rnd.Next(2, 6),
-            _rnd.Next(2, 6),
-            _rnd.Next(2, 6),
-            _rnd.Next(2, 6));
+        int programming = _rnd.Next(2, 6);
+        int philosophy = _rnd.Next(2, 6);
+        int networks = _rnd.Next(2, 6);
+        int optimizationMethods = _rnd.Next(2, 6);
+
+        return new Student(name, programming, philosophy, networks, optimizationMethods);
     }
 
     public static Student CreateWithGrades(string name, int prog, int phil, int net, int opt)
-        => new Student(name, prog, phil, net, opt);
+    {
+        return new Student(name, prog, phil, net, opt);
+    }
 
-    public string GetStudentInfo() =>
-        $"{Name}: Программирование={Programming}, Философия={Philosophy}, " +
-        $"Сети={Networks}, МетодыОптимизации={OptimizationMethods}";
+    public string GetStudentInfo()
+    {
+        string info = $"{Name}: Программирование={Programming}, Философия={Philosophy}, ";
+        info = info + $"Сети={Networks}, МетодыОптимизации={OptimizationMethods}";
+        return info;
+    }
 
     // Студент отчисляется, если хотя бы 2 двойки
     public bool GetDecision()

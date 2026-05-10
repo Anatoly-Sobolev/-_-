@@ -9,24 +9,52 @@ public abstract class ClientCategory
 
 public class BankEmployeeCategory : ClientCategory
 {
-    public override decimal GetMaxLoan(decimal monthlyIncome) => monthlyIncome * 24m;
-    public override decimal GetAnnualRatePercent() => 5m;
+    public override decimal GetMaxLoan(decimal monthlyIncome)
+    {
+        return monthlyIncome * 24m;
+    }
+
+    public override decimal GetAnnualRatePercent()
+    {
+        return 5m;
+    }
 }
 
 public class OrdinaryCitizenCategory : ClientCategory
 {
-    public override decimal GetMaxLoan(decimal monthlyIncome) => monthlyIncome * 10m;
-    public override decimal GetAnnualRatePercent() => 15m;
+    public override decimal GetMaxLoan(decimal monthlyIncome)
+    {
+        return monthlyIncome * 10m;
+    }
+
+    public override decimal GetAnnualRatePercent()
+    {
+        return 15m;
+    }
 }
 
 public class BadCreditHistoryCategory : ClientCategory
 {
-    public override decimal GetMaxLoan(decimal monthlyIncome) => monthlyIncome * 4m;
-    public override decimal GetAnnualRatePercent() => 26m;
+    public override decimal GetMaxLoan(decimal monthlyIncome)
+    {
+        return monthlyIncome * 4m;
+    }
+
+    public override decimal GetAnnualRatePercent()
+    {
+        return 26m;
+    }
 }
 
 public class PensionerCategory : ClientCategory
 {
-    public override decimal GetMaxLoan(decimal monthlyIncome) => monthlyIncome * 8m;
-    public override decimal GetAnnualRatePercent() => 9m;
+    public override decimal GetMaxLoan(decimal monthlyIncome)
+    {
+        return monthlyIncome * 8m;
+    }
+
+    public override decimal GetAnnualRatePercent()
+    {
+        return 9m;
+    }
 }

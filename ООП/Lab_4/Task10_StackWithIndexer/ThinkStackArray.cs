@@ -12,18 +12,31 @@ public class ThinkStackArray
         _items = new Think[capacity];
     }
 
-    public int Count => _count;
+    public int Count
+    {
+        get
+        {
+            return _count;
+        }
+    }
 
     public void Push(Think think)
     {
         if (_count == _items.Length)
+        {
             Array.Resize(ref _items, _items.Length * 2);
+        }
+
         _items[_count++] = think;
     }
 
     public Think Pop()
     {
-        if (_count == 0) throw new InvalidOperationException("Стек пуст.");
+        if (_count == 0)
+        {
+            throw new InvalidOperationException("Стек пуст.");
+        }
+
         return _items[--_count];
     }
 
@@ -33,7 +46,10 @@ public class ThinkStackArray
         get
         {
             if (index < 0 || index >= _count)
+            {
                 throw new IndexOutOfRangeException();
+            }
+
             return _items[index];
         }
     }

@@ -9,55 +9,73 @@ public abstract class Transport
 /// <summary>Автобус: полные и льготные билеты (льготный — половина цены).</summary>
 public class Bus : Transport
 {
-    private readonly int _regularPassengers;
-    private readonly int _concessionPassengers;
-    private readonly decimal _ticketPrice;
+    public int RegularPassengers { get; }
+    public int ConcessionPassengers { get; }
+    public decimal TicketPrice { get; }
 
     public Bus(int regularPassengers, int concessionPassengers, decimal ticketPrice)
     {
-        _regularPassengers = regularPassengers;
-        _concessionPassengers = concessionPassengers;
-        _ticketPrice = ticketPrice;
+        RegularPassengers = regularPassengers;
+        ConcessionPassengers = concessionPassengers;
+        TicketPrice = ticketPrice;
     }
 
     public override decimal GetTripRevenue()
     {
-        return _regularPassengers * _ticketPrice + _concessionPassengers * _ticketPrice * 0.5m;
+        decimal regularRevenue = RegularPassengers * TicketPrice;
+        decimal concessionRevenue = ConcessionPassengers * TicketPrice * 0.5m;
+        return regularRevenue + concessionRevenue;
     }
 }
 
 /// <summary>Такси: оплата по километражу.</summary>
 public class Taxi : Transport
 {
-    private readonly decimal _kilometers;
-    private readonly decimal _pricePerKm;
+    public decimal Kilometers { get; }
+    public decimal PricePerKm { get; }
 
     public Taxi(decimal kilometers, decimal pricePerKm)
     {
-        _kilometers = kilometers;
-        _pricePerKm = pricePerKm;
+        Kilometers = kilometers;
+        PricePerKm = pricePerKm;
     }
 
-    public override decimal GetTripRevenue() => _kilometers * _pricePerKm;
+    public override decimal GetTripRevenue()
+    {
+        return Kilometers * PricePerKm;
+    }
 }
 
 /// <summary>Электричка: фиксированный билет на человека.</summary>
 public class CommuterTrain : Transport
 {
-    private readonly int _passengers;
-    private readonly decimal _ticketPrice;
+    public int Passengers { get; }
+    public decimal TicketPrice { get; }
 
     public CommuterTrain(int passengers, decimal ticketPrice)
     {
-        _passengers = passengers;
-        _ticketPrice = ticketPrice;
+        Passengers = passengers;
+        TicketPrice = ticketPrice;
     }
 
-    public override decimal GetTripRevenue() => _passengers * _ticketPrice;
+    public override decimal GetTripRevenue()
+    {
+        return Passengers * TicketPrice;
+    }
 }
 
 public static class TripAccounting
 {
-    public static decimal TotalRevenue(IEnumerable<Transport> transports) =>
-        transports.Sum(t => t.GetTripRevenue());
+    public static decimal TotalRevenue(IEnumerable<Transport> transports)
+    {
+        decimal totalRevenue = 0m;
+
+        foreach (Transport transport in transports)
+        {
+            decimal transportRevenue = transport.GetTripRevenue();
+            totalRevenue = totalRevenue + transportRevenue;
+        }
+
+        return totalRevenue;
+    }
 }

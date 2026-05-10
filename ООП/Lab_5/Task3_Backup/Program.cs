@@ -9,28 +9,42 @@ if (args.Length < 2)
 string source = args[0];
 string backupRoot = args[1];
 
-var sourceDir = new DirectoryInfo(source);
+DirectoryInfo sourceDir = new DirectoryInfo(source);
+
 if (!sourceDir.Exists)
 {
     Console.WriteLine("Папка-источник не существует.");
     return;
 }
 
-var backupRootDir = new DirectoryInfo(backupRoot);
+DirectoryInfo backupRootDir = new DirectoryInfo(backupRoot);
 backupRootDir.Create();
 
 // Определяем следующий номер версии
 int nextVersion = 1;
-foreach (var d in backupRootDir.GetDirectories("version_*"))
+
+DirectoryInfo[] versionDirectories = backupRootDir.GetDirectories("version_*");
+
+foreach (DirectoryInfo directory in versionDirectories)
 {
-    if (int.TryParse(d.Name.Replace("version_", ""), out int v) && v >= nextVersion)
-        nextVersion = v + 1;
+    string versionText = directory.Name.Replace("version_", "");
+    int versionNumber;
+
+    if (int.TryParse(versionText, out versionNumber))
+    {
+        if (versionNumber >= nextVersion)
+        {
+            nextVersion = versionNumber + 1;
+        }
+    }
 }
 
 // Если уже есть резервные копии — сравниваем с последней
 if (nextVersion > 1)
 {
-    var lastVersionDir = new DirectoryInfo(Path.Combine(backupRoot, $"version_{nextVersion - 1}"));
+    string lastVersionPath = Path.Combine(backupRoot, $"version_{nextVersion - 1}");
+    DirectoryInfo lastVersionDir = new DirectoryInfo(lastVersionPath);
+
     if (!HasChanges(sourceDir, lastVersionDir))
     {
         Console.WriteLine("Изменений не обнаружено. Резервная копия не создана.");
@@ -39,36 +53,76 @@ if (nextVersion > 1)
 }
 
 // Копируем содержимое в новую версию
-var targetDir = new DirectoryInfo(Path.Combine(backupRoot, $"version_{nextVersion}"));
+string targetPath = Path.Combine(backupRoot, $"version_{nextVersion}");
+DirectoryInfo targetDir = new DirectoryInfo(targetPath);
 CopyDirectory(sourceDir, targetDir);
 Console.WriteLine($"Создана резервная копия: {targetDir.FullName}");
 
 static bool HasChanges(DirectoryInfo source, DirectoryInfo backup)
 {
-    var sourceFiles = source.GetFiles().OrderBy(f => f.Name).ToArray();
-    var backupFiles = backup.GetFiles().OrderBy(f => f.Name).ToArray();
+    FileInfo[] sourceFiles = source.GetFiles();
+    FileInfo[] backupFiles = backup.GetFiles();
 
-    if (sourceFiles.Length != backupFiles.Length) return true;
+    Array.Sort(sourceFiles, CompareFilesByName);
+    Array.Sort(backupFiles, CompareFilesByName);
+
+    if (sourceFiles.Length != backupFiles.Length)
+    {
+        return true;
+    }
 
     for (int i = 0; i < sourceFiles.Length; i++)
     {
-        if (sourceFiles[i].Name != backupFiles[i].Name) return true;
-        if (GetMd5(sourceFiles[i]) != GetMd5(backupFiles[i])) return true;
+        if (sourceFiles[i].Name != backupFiles[i].Name)
+        {
+            return true;
+        }
+
+        string sourceMd5 = GetMd5(sourceFiles[i]);
+        string backupMd5 = GetMd5(backupFiles[i]);
+
+        if (sourceMd5 != backupMd5)
+        {
+            return true;
+        }
     }
+
     return false;
+}
+
+static int CompareFilesByName(FileInfo firstFile, FileInfo secondFile)
+{
+    return string.Compare(firstFile.Name, secondFile.Name, StringComparison.OrdinalIgnoreCase);
 }
 
 static string GetMd5(FileInfo file)
 {
-    using var stream = file.OpenRead();
-    return Convert.ToHexString(MD5.HashData(stream));
+    using (FileStream stream = file.OpenRead())
+    {
+        byte[] hashBytes = MD5.HashData(stream);
+        string hashText = Convert.ToHexString(hashBytes);
+        return hashText;
+    }
 }
 
 static void CopyDirectory(DirectoryInfo source, DirectoryInfo target)
 {
     target.Create();
-    foreach (var file in source.GetFiles())
-        file.CopyTo(Path.Combine(target.FullName, file.Name), overwrite: true);
-    foreach (var sub in source.GetDirectories())
-        CopyDirectory(sub, new DirectoryInfo(Path.Combine(target.FullName, sub.Name)));
+
+    FileInfo[] files = source.GetFiles();
+
+    foreach (FileInfo file in files)
+    {
+        string targetFilePath = Path.Combine(target.FullName, file.Name);
+        file.CopyTo(targetFilePath, overwrite: true);
+    }
+
+    DirectoryInfo[] subDirectories = source.GetDirectories();
+
+    foreach (DirectoryInfo subDirectory in subDirectories)
+    {
+        string targetSubDirectoryPath = Path.Combine(target.FullName, subDirectory.Name);
+        DirectoryInfo targetSubDirectory = new DirectoryInfo(targetSubDirectoryPath);
+        CopyDirectory(subDirectory, targetSubDirectory);
+    }
 }

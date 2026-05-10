@@ -13,21 +13,27 @@ string groupFileName = "ЭВМ-252.txt";
 string backupFileName = "ЭВМ-252_backup.txt";
 
 // Создаём файл и записываем одногруппников
-var fileInfo = new FileInfo(groupFileName);
-using (var writer = fileInfo.CreateText())
+FileInfo fileInfo = new FileInfo(groupFileName);
+
+using (StreamWriter writer = fileInfo.CreateText())
 {
-    foreach (var name in classmates)
+    foreach (string name in classmates)
+    {
         writer.WriteLine(name);
+    }
 }
+
 Console.WriteLine($"Файл создан: {fileInfo.FullName}");
 
 // Создаём резервную копию
 fileInfo.CopyTo(backupFileName, overwrite: true);
-Console.WriteLine($"Резервная копия: {new FileInfo(backupFileName).FullName}");
+
+FileInfo backupFileInfo = new FileInfo(backupFileName);
+Console.WriteLine($"Резервная копия: {backupFileInfo.FullName}");
 
 // Удаляем оригинал
 fileInfo.Delete();
-Console.WriteLine($"Оригинал удалён. Резервная копия существует: {new FileInfo(backupFileName).Exists}");
+Console.WriteLine($"Оригинал удалён. Резервная копия существует: {backupFileInfo.Exists}");
 
 // Чистим за собой
-new FileInfo(backupFileName).Delete();
+backupFileInfo.Delete();

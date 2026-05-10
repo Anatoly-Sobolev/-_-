@@ -34,22 +34,47 @@ public class Think : IThink
     }
 
     public static Think CreateWithType(TypeThink type, string text)
-        => new Think(type, text);
-
-    public static Think GenerateThink()
     {
-        var type = (TypeThink)_rnd.Next(0, 3);
-        string text = type switch
-        {
-            TypeThink.Study => _studyThoughts[_rnd.Next(_studyThoughts.Length)],
-            TypeThink.Food  => _foodThoughts[_rnd.Next(_foodThoughts.Length)],
-            _               => _gameThoughts[_rnd.Next(_gameThoughts.Length)],
-        };
         return new Think(type, text);
     }
 
-    public string GetThinkInfo() => $"[{Type}] {Text}";
+    public static Think GenerateThink()
+    {
+        TypeThink type = (TypeThink)_rnd.Next(0, 3);
+        string text;
+
+        if (type == TypeThink.Study)
+        {
+            int index = _rnd.Next(_studyThoughts.Length);
+            text = _studyThoughts[index];
+        }
+        else if (type == TypeThink.Food)
+        {
+            int index = _rnd.Next(_foodThoughts.Length);
+            text = _foodThoughts[index];
+        }
+        else
+        {
+            int index = _rnd.Next(_gameThoughts.Length);
+            text = _gameThoughts[index];
+        }
+
+        return new Think(type, text);
+    }
+
+    public string GetThinkInfo()
+    {
+        return $"[{Type}] {Text}";
+    }
 
     // Мысль хорошая, если это мысль об учёбе
-    public bool GetDecision() => Type == TypeThink.Study;
+    public bool GetDecision()
+    {
+        if (Type == TypeThink.Study)
+        {
+            return true;
+        }
+
+        return false;
+    }
 }

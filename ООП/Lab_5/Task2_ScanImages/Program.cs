@@ -1,20 +1,31 @@
 using System.Security;
 
 string outputFile = "pictures.txt";
-var pictures = new List<string>();
+List<string> pictures = new List<string>();
 
 string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tiff", ".webp" };
 
-foreach (var drive in DriveInfo.GetDrives().Where(d => d.IsReady))
+DriveInfo[] drives = DriveInfo.GetDrives();
+
+foreach (DriveInfo drive in drives)
 {
-    ScanDirectory(new DirectoryInfo(drive.RootDirectory.FullName), imageExtensions, pictures);
+    if (drive.IsReady)
+    {
+        DirectoryInfo rootDirectory = new DirectoryInfo(drive.RootDirectory.FullName);
+        ScanDirectory(rootDirectory, imageExtensions, pictures);
+    }
 }
 
 // Сохраняем список в файл через FileInfo
-var outputInfo = new FileInfo(outputFile);
-using var writer = outputInfo.CreateText();
-foreach (var path in pictures)
-    writer.WriteLine(path);
+FileInfo outputInfo = new FileInfo(outputFile);
+
+using (StreamWriter writer = outputInfo.CreateText())
+{
+    foreach (string path in pictures)
+    {
+        writer.WriteLine(path);
+    }
+}
 
 Console.WriteLine($"Найдено изображений: {pictures.Count}");
 Console.WriteLine($"Список сохранён в: {outputInfo.FullName}");
@@ -23,13 +34,42 @@ static void ScanDirectory(DirectoryInfo dir, string[] extensions, List<string> r
 {
     try
     {
-        foreach (var file in dir.GetFiles())
+        FileInfo[] files = dir.GetFiles();
+
+        foreach (FileInfo file in files)
         {
-            if (extensions.Contains(file.Extension.ToLower()))
+            string fileExtension = file.Extension.ToLower();
+
+            if (IsImageExtension(fileExtension, extensions))
+            {
                 result.Add(file.FullName);
+            }
         }
-        foreach (var sub in dir.GetDirectories())
-            ScanDirectory(sub, extensions, result);
+
+        DirectoryInfo[] subDirectories = dir.GetDirectories();
+
+        foreach (DirectoryInfo subDirectory in subDirectories)
+        {
+            ScanDirectory(subDirectory, extensions, result);
+        }
     }
-    catch (Exception ex) when (ex is UnauthorizedAccessException or SecurityException) { }
+    catch (UnauthorizedAccessException)
+    {
+    }
+    catch (SecurityException)
+    {
+    }
+}
+
+static bool IsImageExtension(string fileExtension, string[] imageExtensions)
+{
+    foreach (string imageExtension in imageExtensions)
+    {
+        if (fileExtension == imageExtension)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }

@@ -1,9 +1,26 @@
 using Task8_Stack;
 
-var stack = new Stack<Think>();
+Stack<Think> stack = new Stack<Think>();
+
 for (int i = 0; i < 5; i++)
+{
     stack.Push(Think.GenerateThink());
+}
 
 Console.WriteLine("Мысли (последняя — первой):");
-foreach (var t in stack)
-    Console.WriteLine($"  {t.GetThinkInfo()}  → {(t.GetDecision() ? "хорошая" : "плохая")}");
+
+foreach (Think think in stack)
+{
+    string result;
+
+    if (think.GetDecision())
+    {
+        result = "хорошая";
+    }
+    else
+    {
+        result = "плохая";
+    }
+
+    Console.WriteLine($"  {think.GetThinkInfo()}  → {result}");
+}

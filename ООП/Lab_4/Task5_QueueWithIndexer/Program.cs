@@ -3,17 +3,34 @@ using Task5_QueueWithIndexer;
 
 string[] names = { "Иванов А.", "Петров Д.", "Сидоров С." };
 
-var queue = new StudentQueueArray();
-foreach (var name in names)
+StudentQueueArray queue = new StudentQueueArray();
+
+foreach (string name in names)
+{
     queue.Enqueue(Student.GenerateStudent(name));
+}
 
 Console.WriteLine("Доступ по индексу:");
+    
 for (int i = 0; i < queue.Count; i++)
+{
     Console.WriteLine($"  [{i}] {queue[i].GetStudentInfo()}");
+}
 
 Console.WriteLine("\nРезультаты:");
 while (queue.Count > 0)
 {
-    var s = queue.Dequeue();
-    Console.WriteLine($"  {s.Name}: {(s.GetDecision() ? "ОТЧИСЛЕН" : "остаётся")}");
+    Student student = queue.Dequeue();
+    string result;
+
+    if (student.GetDecision())
+    {
+        result = "ОТЧИСЛЕН";
+    }
+    else
+    {
+        result = "остаётся";
+    }
+
+    Console.WriteLine($"  {student.Name}: {result}");
 }
